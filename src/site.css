@@ -3,7 +3,7 @@
   --ink:#1b1f24; --ink2:#5d646c; --line:#dfe3e5;
   --teal:#13505c; --teal2:#1d6b78; --tint:#e6eff0;
   --panel:rgba(255,255,255,.94); --paper:#f4f4f2;
-  --max:1360px; --r:6px;
+  --max:1600px; --r:6px;
   --serif:"Zen Old Mincho","Yu Mincho","Hiragino Mincho ProN",serif;
   --sans:"Yu Gothic UI","Hiragino Sans","Meiryo",system-ui,sans-serif;
 }
@@ -13,7 +13,8 @@ body{margin:0;color:var(--ink);font:15.5px/1.75 var(--sans);background:var(--pap
 body::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--paper) url(assets/bg.jpg) center/cover no-repeat}
 a{color:inherit;text-decoration:none}a:hover{color:var(--teal2)}
 img{max-width:100%;height:auto;display:block}
-.wrap{max-width:var(--max);margin:0 auto;padding:0 32px}
+/* #main.wrap も並べるのは、theme.xml の <b:skin> にある非常用の #main{max-width:1000px} に勝つため */
+.wrap,#main.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
 .serif{font-family:var(--serif)}
 
 /* ---------- ヘッダー ---------- */
@@ -165,7 +166,7 @@ img{max-width:100%;height:auto;display:block}
   .layout{grid-template-columns:minmax(0,1fr)}.side{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:900px){
-  .wrap{padding:0 18px}
+  .wrap,#main.wrap{padding:0 16px}
   .hd .wrap{grid-template-columns:minmax(0,1fr);row-gap:12px}
   .logo{grid-row:auto;width:220px}.tag{display:none}
   .nav{grid-column:1;padding-left:0;margin:0;flex-wrap:nowrap;overflow-x:auto;gap:22px;scrollbar-width:none}
