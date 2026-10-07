@@ -27,6 +27,9 @@
     slides: 4,            // 大きな特集の枚数
     newArrivals: 4,       // 「新着記事」の件数
     slideSeconds: 6,      // 特集が切り替わる間隔（秒）
+    // トップを開いたときの開幕演出。やめたいときは enabled を false にするだけ
+    // minMs：演出を最低限見せる長さ／maxMs：記事が遅くても幕を上げる長さ（ミリ秒）
+    intro: { enabled: true, minMs: 2700, maxMs: 4200 },
     tagline: '創刊60周年　学生目線の記事を届ける東北大学新聞',
     // ヘッダーのメニュー（[表示名, リンク先]）
     nav: [
@@ -231,18 +234,62 @@
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) auto();
   }
 
+  // 新着とラベル 6 つを同時に取る（7 回だが並行するので約 1 秒）。
+  // 150 件を 1 回で取ってラベルで振り分ける案は、量が 3 倍になり、直近に無いラベルも出るので遅かった（2026-10-07 実測）
   function loadHome() {
     var jobs = [feed(null, 12)].concat(CONFIG.sections.map(function (s) { return feed(s[0], CONFIG.perSection); }));
-    Promise.all(jobs.map(function (j) { return j.catch(function () { return []; }); }))
+    return Promise.all(jobs.map(function (j) { return j.catch(function () { return []; }); }))
       .then(function (r) {
-        if (!r[0].length && window.TONPRESS_SNAPSHOT) throw new Error('offline');
+        if (!r[0].length) throw new Error('empty');
         renderHome(r[0], r.slice(1));
       })
       .catch(function () {
         // 手元で開いたとき（フィードに届かないとき）は見本のデータで描く
         var S = window.TONPRESS_SNAPSHOT;
         if (S) renderHome(S.latest, CONFIG.sections.map(function (s) { return S[s[0]] || []; }));
+        else renderHome([], []);
       });
+  }
+
+  /* ---------- 開幕演出（トップ・1 回の訪問で 1 度だけ） ----------
+   * 幕で覆い、ロゴを左から描き、キャッチコピーを 1 文字ずつ出す。記事がそろったら幕が上に抜ける。
+   * 幕は JS が差し込むので、JS が止まっても幕が残ることはない */
+  function intro() {
+    var c = CONFIG.intro;
+    if (!c || !c.enabled || PAGE !== 'index') return null;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+    try {
+      if (sessionStorage.getItem('tp-intro')) return null;
+      sessionStorage.setItem('tp-intro', '1');
+    } catch (e) { /* 保存できない環境では毎回出す */ }
+
+    var root = document.documentElement;
+    var el = document.createElement('div');
+    el.className = 'intro';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<div class="intro-in"><img class="intro-logo" src="' + ASSETS + 'logo-white.png" alt="">' +
+      '<p class="intro-tag">' + Array.from(CONFIG.tagline).map(function (ch, i) {
+        return '<span style="--i:' + i + '">' + (ch === ' ' || ch === '　' ? '&#12288;' : esc(ch)) + '</span>';
+      }).join('') + '</p></div>';
+    document.body.appendChild(el);
+    root.classList.add('intro-lock');
+
+    var start = Date.now(), closed = false;
+    function close() {
+      if (closed) return;
+      closed = true;
+      window.removeEventListener('keydown', close);
+      el.classList.add('out');
+      root.classList.remove('intro-lock');
+      root.classList.add('intro-done');   // 幕が上がると同時に、特集とカードが浮き上がる
+      setTimeout(function () { el.remove(); }, 1300);
+    }
+    el.addEventListener('click', close);          // 押せば飛ばせる
+    window.addEventListener('keydown', close);
+    setTimeout(close, c.maxMs);                    // 記事が遅くても待たせすぎない
+    return {
+      ready: function () { setTimeout(close, Math.max(0, c.minMs - (Date.now() - start))); }
+    };
   }
 
   /* ---------- 記事ページ：共有ボタン ---------- */
@@ -311,7 +358,10 @@
   }
 
   renderChrome();
-  if (PAGE === 'index') loadHome();
+  if (PAGE === 'index') {
+    var curtain = intro();
+    loadHome().then(function () { if (curtain) curtain.ready(); });
+  }
   renderShare();
   renderCareerData();
   relinkPagesOffProduction();

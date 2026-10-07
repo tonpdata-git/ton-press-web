@@ -55,5 +55,21 @@ sections: [
 ## 見本（preview）で確かめる
 
 `preview/index.html` をブラウザで開く。`preview/` は `src/site.css` を直接読むので、色や配置の変更はすぐ見える。
-メニューやトップの並び（`src/app.js` の `CONFIG`）は `preview/preview.js` が別に持っているので、見本では反映されない。
+見本のトップ（`preview/index.html`）は本番と同じ `src/app.js` で動くので、`CONFIG` の変更（トップの並び・開幕演出）も見える。
+ほかの見本ページ（記事・一覧など）は `preview/preview.js` が組んでいるので、`CONFIG` は反映されない。
 本番と同じ動きは試験用ブログで確かめる。
+
+## トップの開幕演出を変える・やめる
+
+`src/app.js` の `CONFIG.intro`。
+
+```js
+intro: { enabled: true, minMs: 2700, maxMs: 4200 },
+```
+
+- やめる：`enabled: false`
+- `minMs`：演出を最低限見せる長さ（ミリ秒）。記事が早くそろっても、この長さまでは幕を上げない
+- `maxMs`：記事が遅くても、この長さで幕を上げる
+- 出るのはトップだけ、1 回の訪問で 1 度だけ（同じタブで開き直しても出ない）。幕を押すか、キーを押すと飛ばせる
+- 「動きを減らす」設定にしている人には出ない
+- 見た目（色・動き）は `src/site.css` の「開幕演出」の節
