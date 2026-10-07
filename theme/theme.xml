@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<!--
+  東北大学新聞 Blogger テーマ（薄い殻）
+  https://github.com/tompdata-git/ton-press-web
+
+  ここに書くのは「Blogger のデータをどの箱に入れるか」だけ。
+  見た目（site.css）と動き（app.js）は jsDelivr から読む。普段の変更はそちらで行い、
+  このファイルは版番号（下の ASSET_VERSION の 2 か所）を書き換えるときしか触らない。
+
+  状態：草案。試験用ブログで動作を確かめるまで本番に入れないこと（docs/release.md）。
+-->
+<html b:css='false' b:defaultwidgetversion='2' b:layoutsVersion='3' b:responsive='true' b:templateVersion='0.1.0' expr:dir='data:blog.languageDirection' lang='ja' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+<head>
+  <meta content='width=device-width, initial-scale=1' name='viewport'/>
+  <b:include data='blog' name='all-head-content'/>
+  <title><b:if cond='data:view.isHomepage'><data:blog.title.escaped/><b:else/><data:view.title.escaped/> | <data:blog.title.escaped/></b:if></title>
+  <link href='https://fonts.googleapis.com' rel='preconnect'/>
+  <link href='https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@700&amp;display=swap' rel='stylesheet'/>
+  <!-- ASSET_VERSION (1/2)：本番に出す版。上げるときはここと末尾の script の 2 か所を同じ番号にする -->
+  <link href='https://cdn.jsdelivr.net/gh/tompdata-git/ton-press-web@v0.1.0/src/site.css' rel='stylesheet'/>
+  <b:skin><![CDATA[
+/* CDN に届かなかったときの最低限（文字が読めればよい） */
+body{margin:0;font-family:"Yu Gothic UI","Hiragino Sans",Meiryo,sans-serif;line-height:1.8;color:#1b1f24;background:#f4f4f2}
+img{max-width:100%;height:auto}
+#main{max-width:1000px;margin:0 auto;padding:0 16px}
+  ]]></b:skin>
+</head>
+
+<body expr:data-page='data:view.isHomepage ? "index" : (data:view.isPost ? "article" : (data:view.isPage ? "page" : "list"))'>
+
+<header class='hd' id='hd'/>
+
+<main class='wrap' id='main'>
+
+  <!-- トップ：中身は app.js が公開フィードから組む -->
+  <b:if cond='data:view.isHomepage'>
+    <div class='hero' id='hero'/>
+    <div id='blocks'/>
+  </b:if>
+
+  <div expr:class='data:view.isHomepage ? "layout is-home" : "layout"'>
+
+    <b:section class='main-col' id='main-col' maxwidgets='1' showaddelement='false'>
+      <b:widget id='Blog1' locked='true' title='ブログの投稿' type='Blog' version='2' visible='true'>
+        <b:includable id='main'>
+          <b:if cond='!data:view.isHomepage'>
+
+            <!-- パンくず -->
+            <div class='crumb'>
+              <a expr:href='data:blog.homepageUrl'>トップ</a>
+              <b:if cond='data:view.isLabelSearch'> ＞ <data:view.search.label/></b:if>
+              <b:if cond='data:view.isSearch and !data:view.isLabelSearch'> ＞ 検索結果</b:if>
+              <b:if cond='data:view.isSingleItem'> ＞ <data:view.title.escaped/></b:if>
+            </div>
+
+            <b:if cond='data:view.isMultipleItems'>
+              <!-- 一覧（ラベル・検索・月別） -->
+              <div class='lh'>
+                <div class='sh'>
+                  <h2>
+                    <b:if cond='data:view.isLabelSearch'><data:view.search.label/>
+                    <b:elseif cond='data:view.isSearch'/>「<data:view.search.query/>」の検索結果
+                    <b:else/>記事一覧</b:if>
+                  </h2>
+                  <span class='bar'/>
+                  <span class='en'><b:if cond='data:view.isLabelSearch'>LABEL<b:else/>ARTICLES</b:if></span>
+                </div>
+              </div>
+              <b:if cond='data:posts.empty'>
+                <p class='lh'>該当する記事はありませんでした。</p>
+              </b:if>
+              <div class='cards two'>
+                <b:loop values='data:posts' var='post'>
+                  <a class='card' expr:href='data:post.url'>
+                    <div class='ph'>
+                      <b:if cond='data:post.featuredImage'>
+                        <img alt='' expr:src='resizeImage(data:post.featuredImage, 640)' loading='lazy'/>
+                      <b:else/>
+                        <div class='noimg'/>
+                      </b:if>
+                    </div>
+                    <div class='b'>
+                      <span class='meta'><b:if cond='data:post.labels'><data:post.labels.first.name/> ・ </b:if><data:post.date/></span>
+                      <h3><data:post.title/></h3>
+                      <p><data:post.snippets.short/></p>
+                      <span class='go circ'>›</span>
+                    </div>
+                  </a>
+                </b:loop>
+              </div>
+              <nav aria-label='ページ送り' class='pages'>
+                <b:if cond='data:newerPageUrl'><a expr:href='data:newerPageUrl'>‹ 新しい記事</a></b:if>
+                <b:if cond='data:olderPageUrl'><a expr:href='data:olderPageUrl'>前の記事 ›</a></b:if>
+              </nav>
+
+            <b:else/>
+              <!-- 記事・固定ページ -->
+              <b:loop values='data:posts' var='post'>
+                <article class='sheet art'>
+                  <b:if cond='data:post.labels'>
+                    <span class='chip'><data:post.labels.first.name/></span>
+                  </b:if>
+                  <h1><data:post.title/></h1>
+                  <b:if cond='data:view.isPost'>
+                    <div class='meta'>
+                      <span><data:post.date/></span>
+                      <span><b:loop values='data:post.labels' var='label'><a class='lab' expr:href='data:label.url'>#<data:label.name/></a>　</b:loop></span>
+                    </div>
+                  </b:if>
+                  <div class='body post-body'><data:post.body/></div>
+                  <b:if cond='data:view.isPost'>
+                    <div class='share' data-share='' expr:data-title='data:post.title' expr:data-url='data:post.url'/>
+                    <div class='comments-wrap'>
+                      <b:include data='post' name='commentPicker'/>
+                    </div>
+                  </b:if>
+                </article>
+              </b:loop>
+            </b:if>
+
+          </b:if>
+        </b:includable>
+      </b:widget>
+    </b:section>
+
+    <aside class='side'>
+      <b:section id='side-section' showaddelement='false'>
+        <b:widget id='PopularPosts1' locked='false' title='人気記事' type='PopularPosts' version='2' visible='true'>
+          <b:includable id='main'>
+            <div class='panel'>
+              <div class='ph2'><h2>人気記事</h2><span class='bar'/><span class='en'>POPULAR</span></div>
+              <div class='rank'>
+                <b:loop values='data:posts' var='post'>
+                  <a class='news' expr:href='data:post.url'>
+                    <div class='ph'><b:if cond='data:post.featuredImage'><img alt='' expr:src='resizeImage(data:post.featuredImage, 240)' loading='lazy'/></b:if></div>
+                    <div><b><data:post.title/></b></div>
+                  </a>
+                </b:loop>
+              </div>
+            </div>
+          </b:includable>
+        </b:widget>
+        <b:widget id='Label2' locked='false' title='ラベル' type='Label' version='2' visible='true'>
+          <b:includable id='main'>
+            <div class='panel'>
+              <div class='ph2'><h2>ラベル</h2><span class='bar'/><span class='en'>LABELS</span></div>
+              <div class='tags'>
+                <b:loop values='data:labels' var='label'>
+                  <a expr:href='data:label.url'><data:label.name/></a>
+                </b:loop>
+              </div>
+            </div>
+          </b:includable>
+        </b:widget>
+      </b:section>
+    </aside>
+
+  </div>
+</main>
+
+<footer class='ft' id='ft'/>
+
+<!-- ASSET_VERSION (2/2) -->
+<script defer='defer' src='https://cdn.jsdelivr.net/gh/tompdata-git/ton-press-web@v0.1.0/src/app.js'/>
+</body>
+</html>

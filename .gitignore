@@ -1,0 +1,6 @@
+# 元のテーマ（ThemeForestの購入品）は公開しない。手元のバックアップは 報道部/ 直下にある
+theme/original*
+*.bak
+Thumbs.db
+.DS_Store
+node_modules/
