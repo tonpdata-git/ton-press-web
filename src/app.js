@@ -1,6 +1,6 @@
 /*!
  * 東北大学新聞 ウェブサイト用スクリプト（本番）
- * https://github.com/tompdata-git/ton-press-web
+ * https://github.com/tonpdata-git/ton-press-web
  *
  * 役割分担：
  *   - 記事本文・記事一覧・固定ページ・コメント・人気記事 … Blogger が HTML を組む（theme/theme.xml）
