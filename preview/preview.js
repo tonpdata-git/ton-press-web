@@ -26,10 +26,10 @@ $('#ft').innerHTML='<div class="wrap"><div><img src="../src/assets/logo-white.pn
  '<div><h4>CONTACT</h4><a href="#">お問い合わせ</a><a href="#">広告掲載について</a><a href="pdf.html">PDF版</a><a href="https://twitter.com/ton_press">X（@ton_press）</a></div>'+
  '<small>© 東北大学学友会報道部</small></div>';
 
-/* スクロールしたらヘッダーを細くする。境目で行ったり来たりしないよう、縮める点と戻す点をずらす */
-var hd=$('#hd'),mini=false;
-function onScroll(){var y=window.scrollY;if(!mini&&y>120){mini=true;hd.classList.add('mini')}else if(mini&&y<20){mini=false;hd.classList.remove('mini')}}
-window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+/* 大きいヘッダーが画面から消えたら、同じ中身の細い帯を上から出す（本番の src/app.js と同じ仕組み） */
+var hd=$('#hd'),bar=document.createElement('div');bar.className='hd mini hdfix';bar.setAttribute('aria-hidden','true');bar.innerHTML=hd.innerHTML;document.body.appendChild(bar);
+var shown=false;function onScroll(){var past=hd.getBoundingClientRect().bottom<0;if(past===shown)return;shown=past;bar.classList.toggle('show',past);bar.setAttribute('aria-hidden',past?'false':'true')}
+window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll);onScroll();
 
 function newsRow(p){return '<a class="news" href="article.html"><div class="ph">'+img(p)+'</div><div><span class="meta"><span class="lab">'+esc(lab(p))+'</span> ・ '+date(p.date)+'</span><b>'+esc(p.title)+'</b></div><span class="chev">›</span></a>'}
 function card(p,l){return '<a class="card" href="article.html"><div class="ph">'+img(p)+'</div><div class="b"><span class="meta">'+esc(lab(p,l))+' ・ '+date(p.date)+'</span><h3>'+esc(p.title)+'</h3><p>'+esc(p.summary)+'</p><span class="go circ">›</span></div></a>'}

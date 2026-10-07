@@ -92,14 +92,28 @@
         '<form class="search" action="/search" method="get" role="search">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
         '<input name="q" placeholder="記事を検索" aria-label="記事を検索"><button>検索</button></form></div>';
-      // スクロールしたら細い帯にする。境目で行き来しないよう、縮める点と戻す点をずらす
-      var mini = false;
+      // 大きいヘッダーが画面から消えたら、同じ中身の細い帯を上から出す。
+      // 大きいヘッダーの位置も大きさも変えないので、記事に重なることも、ページが跳ねることもない
+      var bar = document.createElement('div');
+      bar.className = 'hd mini hdfix';
+      bar.setAttribute('aria-hidden', 'true');
+      bar.innerHTML = hd.innerHTML;
+      bar.querySelector('.nav').setAttribute('aria-label', 'メニュー（固定）');
+      bar.querySelectorAll('a,input,button').forEach(function (el) { el.setAttribute('tabindex', '-1'); });
+      document.body.appendChild(bar);
+      var shown = false;
       var onScroll = function () {
-        var y = window.scrollY;
-        if (!mini && y > 120) { mini = true; hd.classList.add('mini'); }
-        else if (mini && y < 20) { mini = false; hd.classList.remove('mini'); }
+        var past = hd.getBoundingClientRect().bottom < 0;
+        if (past === shown) return;
+        shown = past;
+        bar.classList.toggle('show', past);
+        bar.setAttribute('aria-hidden', past ? 'false' : 'true');
+        bar.querySelectorAll('a,input,button').forEach(function (el) {
+          if (past) el.removeAttribute('tabindex'); else el.setAttribute('tabindex', '-1');
+        });
       };
       window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
       onScroll();
     }
     if (ft) {
