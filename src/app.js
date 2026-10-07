@@ -39,11 +39,23 @@
       ['報道部とは', '/p/blog-page_41.html'],
       ['PDF版', '/p/blog-page_7286.html']
     ],
+    // 進路データ（旧テーマのサイドバーにあったもの）。PDF版のページの末尾に出す
+    careerPage: '/p/blog-page_7286.html',
+    careerData: [
+      ['進路データ2024', '/2024/10/524.html'],
+      ['進路データ2023', '/2023/10/shin.html'],
+      ['進路データ2022', '/2022/11/shinro22.html'],
+      ['進路データ2021', '/2021/09/sinro21.html'],
+      ['進路データ2020', '/2021/08/sinro2020.html'],
+      ['進路データ2019', '/2019/12/shinrodata2019.html']
+    ],
     footer: {
       about: [
         ['報道部について', '/p/blog-page_41.html'],
         ['「東北大学新聞」とは', '/p/blog-page_73.html'],
-        ['新聞配布場所一覧', '/p/blog-page_19.html']
+        ['新聞配布場所一覧', '/p/blog-page_19.html'],
+        // 「報道部について」の最後に部員募集の案内がある（旧テーマの「入部を希望する方へ」の置き換え）
+        ['入部を希望する方へ', '/p/blog-page_41.html']
       ],
       contact: [
         ['お問い合わせ', '/p/blog-page_15.html'],
@@ -251,6 +263,22 @@
     });
   }
 
+  /* ---------- PDF版のページ：進路データの欄を足す ---------- */
+  function renderCareerData() {
+    if (PAGE !== 'page' || !CONFIG.careerData.length) return;
+    var body = $('.post-body');
+    var onPdfPage = location.pathname === CONFIG.careerPage ||
+      // 試験用ブログでは住所が違うので、題名でも判定する
+      (location.hostname !== 'ton-press.blogspot.com' && /^PDF版/.test(document.title));
+    if (!body || !onPdfPage) return;
+    var box = document.createElement('section');
+    box.className = 'career';
+    box.innerHTML = '<div class="sh"><h2>進路データ</h2><span class="bar"></span><span class="en">CAREER DATA</span></div>' +
+      '<p>東北大生の卒業後の進路をまとめた記事です。</p><div class="tags">' +
+      CONFIG.careerData.map(function (c) { return '<a href="' + esc(c[1]) + '">' + esc(c[0]) + '</a>'; }).join('') + '</div>';
+    body.parentNode.insertBefore(box, body.nextSibling);
+  }
+
   /* ---------- 試験用ブログ：固定ページの住所を題名で引き直す ----------
    * 固定ページの住所（/p/blog-page_41.html など）は本番のもの。記事を取り込んだ試験用ブログでは
    * 別の住所になるので、本番以外で開いたときだけ、題名を手がかりに差し替える */
@@ -285,5 +313,6 @@
   renderChrome();
   if (PAGE === 'index') loadHome();
   renderShare();
+  renderCareerData();
   relinkPagesOffProduction();
 })();

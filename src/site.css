@@ -202,3 +202,8 @@ img{max-width:100%;height:auto;display:block}
 .comments-wrap .user,.comments-wrap .user a{font-weight:700;color:var(--teal)}
 .comments-wrap .datetime,.comments-wrap .datetime a{font-size:12.5px;color:var(--ink2)}
 .comments-wrap iframe{max-width:100%}
+
+/* PDF版のページの「進路データ」欄（app.js が足す） */
+.career{margin-top:36px;padding-top:24px;border-top:1px solid var(--line)}
+.career p{margin:0 0 10px;color:var(--ink2);font-size:14px}
+.career .tags a{font-size:14px;padding:6px 16px}
