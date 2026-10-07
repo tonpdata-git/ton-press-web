@@ -148,7 +148,8 @@
   function feed(label, n) {
     var path = '/feeds/posts/summary' + (label ? '/-/' + encodeURIComponent(label) : '') +
       '?alt=json&max-results=' + n;
-    return fetch(path, { credentials: 'omit' })
+    // same-origin：限定公開のブログ（試験用）では、閲覧を許された人のログイン情報が要る
+    return fetch(path, { credentials: 'same-origin' })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (j) { return (j.feed.entry || []).map(fromEntry); });
   }
@@ -171,6 +172,11 @@
   function renderHome(latest, bySection) {
     var hero = $('#hero'), blocks = $('#blocks');
     if (!hero || !blocks) return;
+    if (!latest.length) {
+      // 記事が取れなかったときに、空の黒い箱を出さない
+      hero.innerHTML = '<div class="panel" style="grid-column:1/-1;padding:28px">記事を読み込めませんでした。時間をおいて再読み込みしてください。</div>';
+      return;
+    }
     var slides = latest.filter(function (p) { return p.img; }).slice(0, CONFIG.slides);
     var rest = latest.filter(function (p) { return p !== slides[0]; }).slice(0, CONFIG.newArrivals);
     var pad = function (n) { return (n < 10 ? '0' : '') + n; };
