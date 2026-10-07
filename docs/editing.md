@@ -55,7 +55,8 @@ sections: [
 ## 見本（preview）で確かめる
 
 `preview/index.html` をブラウザで開く。`preview/` は `src/site.css` を直接読むので、色や配置の変更はすぐ見える。
-メニューやトップの並び（`src/app.js` の `CONFIG`）は `preview/preview.js` が別に持っているので、見本では反映されない。
+見本のトップ（`preview/index.html`）は本番と同じ `src/app.js` で動くので、`CONFIG` の変更（トップの並び・開幕演出）も見える。
+ほかの見本ページ（記事・一覧など）は `preview/preview.js` が組んでいるので、`CONFIG` は反映されない。
 本番と同じ動きは試験用ブログで確かめる。
 
 ## トップの開幕演出を変える・やめる
