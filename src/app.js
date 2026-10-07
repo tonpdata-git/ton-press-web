@@ -29,7 +29,7 @@
     slideSeconds: 6,      // 特集が切り替わる間隔（秒）
     // トップを開いたときの開幕演出。やめたいときは enabled を false にするだけ
     // minMs：演出を最低限見せる長さ／maxMs：記事が遅くても幕を上げる長さ（ミリ秒）
-    intro: { enabled: true, minMs: 1900, maxMs: 3200 },
+    intro: { enabled: true, minMs: 2700, maxMs: 4200 },
     tagline: '創刊60周年　学生目線の記事を届ける東北大学新聞',
     // ヘッダーのメニュー（[表示名, リンク先]）
     nav: [
@@ -282,7 +282,7 @@
       el.classList.add('out');
       root.classList.remove('intro-lock');
       root.classList.add('intro-done');   // 幕が上がると同時に、特集とカードが浮き上がる
-      setTimeout(function () { el.remove(); }, 1000);
+      setTimeout(function () { el.remove(); }, 1300);
     }
     el.addEventListener('click', close);          // 押せば飛ばせる
     window.addEventListener('keydown', close);

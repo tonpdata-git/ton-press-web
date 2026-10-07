@@ -64,7 +64,7 @@ sections: [
 `src/app.js` の `CONFIG.intro`。
 
 ```js
-intro: { enabled: true, minMs: 1900, maxMs: 3200 },
+intro: { enabled: true, minMs: 2700, maxMs: 4200 },
 ```
 
 - やめる：`enabled: false`
