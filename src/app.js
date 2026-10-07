@@ -251,7 +251,39 @@
     });
   }
 
+  /* ---------- 試験用ブログ：固定ページの住所を題名で引き直す ----------
+   * 固定ページの住所（/p/blog-page_41.html など）は本番のもの。記事を取り込んだ試験用ブログでは
+   * 別の住所になるので、本番以外で開いたときだけ、題名を手がかりに差し替える */
+  var PRODUCTION_HOST = 'ton-press.blogspot.com';
+  var PAGE_TITLES = {
+    '/p/blog-page_41.html': '報道部について',
+    '/p/blog-page_73.html': '「東北大学新聞」とは',
+    '/p/blog-page_19.html': '新聞配布場所一覧',
+    '/p/blog-page_7286.html': 'PDF版',
+    '/p/blog-page_15.html': 'お問い合わせ方法',
+    '/p/blog-page_12.html': '広告掲載について'
+  };
+  function relinkPagesOffProduction() {
+    if (location.hostname === PRODUCTION_HOST) return;
+    fetch('/feeds/pages/default?alt=json&max-results=100', { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j) return;
+        var byTitle = {};
+        (j.feed.entry || []).forEach(function (e) {
+          var l = (e.link || []).filter(function (x) { return x.rel === 'alternate'; })[0];
+          if (l) byTitle[e.title.$t.trim()] = new URL(l.href).pathname;
+        });
+        document.querySelectorAll('a[href^="/p/"]').forEach(function (a) {
+          var t = PAGE_TITLES[a.getAttribute('href')];
+          if (t && byTitle[t]) a.setAttribute('href', byTitle[t]);
+        });
+      })
+      .catch(function () {});
+  }
+
   renderChrome();
   if (PAGE === 'index') loadHome();
   renderShare();
+  relinkPagesOffProduction();
 })();

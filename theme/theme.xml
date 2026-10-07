@@ -18,7 +18,7 @@
   <link href='https://fonts.googleapis.com' rel='preconnect'/>
   <link href='https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@700&amp;display=swap' rel='stylesheet'/>
   <!-- ASSET_VERSION (1/2)：本番に出す版。上げるときはここと末尾の script の 2 か所を同じ番号にする -->
-  <link href='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.1.2/src/site.css' rel='stylesheet'/>
+  <link href='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.1.3/src/site.css' rel='stylesheet'/>
   <b:skin><![CDATA[
 /* CDN に届かなかったときの最低限（文字が読めればよい） */
 body{margin:0;font-family:"Yu Gothic UI","Hiragino Sans",Meiryo,sans-serif;line-height:1.8;color:#1b1f24;background:#f4f4f2}
@@ -162,6 +162,6 @@ img{max-width:100%;height:auto}
 <footer class='ft' id='ft'/>
 
 <!-- ASSET_VERSION (2/2) -->
-<script defer='defer' src='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.1.2/src/app.js'/>
+<script defer='defer' src='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.1.3/src/app.js'/>
 </body>
 </html>
