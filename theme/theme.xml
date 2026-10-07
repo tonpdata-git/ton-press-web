@@ -10,7 +10,7 @@
 
   状態：草案。試験用ブログで動作を確かめるまで本番に入れないこと（docs/release.md）。
 -->
-<html b:css='false' b:defaultwidgetversion='2' b:layoutsVersion='3' b:responsive='true' b:templateVersion='0.1.0' expr:dir='data:blog.languageDirection' lang='ja' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+<html b:css='false' b:defaultwidgetversion='2' b:layoutsVersion='3' b:responsive='true' b:templateVersion='0.1.1' expr:dir='data:blog.languageDirection' lang='ja' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
 <head>
   <meta content='width=device-width, initial-scale=1' name='viewport'/>
   <b:include data='blog' name='all-head-content'/>
@@ -18,7 +18,7 @@
   <link href='https://fonts.googleapis.com' rel='preconnect'/>
   <link href='https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@700&amp;display=swap' rel='stylesheet'/>
   <!-- ASSET_VERSION (1/2)：本番に出す版。上げるときはここと末尾の script の 2 か所を同じ番号にする -->
-  <link href='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.1.0/src/site.css' rel='stylesheet'/>
+  <link href='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.1.2/src/site.css' rel='stylesheet'/>
   <b:skin><![CDATA[
 /* CDN に届かなかったときの最低限（文字が読めればよい） */
 body{margin:0;font-family:"Yu Gothic UI","Hiragino Sans",Meiryo,sans-serif;line-height:1.8;color:#1b1f24;background:#f4f4f2}
@@ -41,7 +41,7 @@ img{max-width:100%;height:auto}
 
   <div expr:class='data:view.isHomepage ? "layout is-home" : "layout"'>
 
-    <b:section class='main-col' id='main-col' maxwidgets='1' showaddelement='false'>
+    <b:section class='main-col' id='main-col' maxwidgets='1' name='記事' showaddelement='true'>
       <b:widget id='Blog1' locked='true' title='ブログの投稿' type='Blog' version='2' visible='true'>
         <b:includable id='main'>
           <b:if cond='!data:view.isHomepage'>
@@ -125,7 +125,7 @@ img{max-width:100%;height:auto}
     </b:section>
 
     <aside class='side'>
-      <b:section id='side-section' showaddelement='false'>
+      <b:section id='side-section' name='右の欄' showaddelement='true'>
         <b:widget id='PopularPosts1' locked='false' title='人気記事' type='PopularPosts' version='2' visible='true'>
           <b:includable id='main'>
             <div class='panel'>
@@ -162,6 +162,6 @@ img{max-width:100%;height:auto}
 <footer class='ft' id='ft'/>
 
 <!-- ASSET_VERSION (2/2) -->
-<script defer='defer' src='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.1.0/src/app.js'/>
+<script defer='defer' src='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.1.2/src/app.js'/>
 </body>
 </html>
