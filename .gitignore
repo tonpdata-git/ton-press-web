@@ -4,3 +4,4 @@ theme/original*
 Thumbs.db
 .DS_Store
 node_modules/
+staging-import.xml
