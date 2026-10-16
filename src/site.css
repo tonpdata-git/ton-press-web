@@ -32,7 +32,9 @@ body{margin:0;color:var(--ink);font:400 16px/1.8 var(--sans);letter-spacing:.02e
  *   同じ層の一番上に置き、background-blend-mode: overlay で色に混ぜる（明るい粒と暗い粒の両方が出る）。
  *   背景にだけ掛かり、カードには掛からない */
 html{background:#a9d3d7}
-body{background:transparent}
+/* html body と強めに書くのは、theme.xml の <b:skin> にある非常用の body{background:#f4f4f2} に勝つため。
+ * 負けると body の白い面がグラデーションの層の上に塗られて、背景が真っ白になる（2026-10-17 に試験用ブログで起きた） */
+html body{background:transparent}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E") 0 0/200px 200px,
