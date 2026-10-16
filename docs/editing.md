@@ -49,8 +49,12 @@ sections: [
 
 ## ロゴ・背景を変える
 
-`src/assets/` の同じ名前のファイルを差し替える（`logo.png` `logo-white.png` `bg.jpg`）。
-背景は 2000px 前後の幅、200KB 以下に縮めてから入れる。
+ロゴは `src/assets/` の同じ名前のファイルを差し替える（`logo.png` `logo-white.png`）。
+
+背景は画像ではなく、`src/site.css` の「背景」の節にあるターコイズのグラデーションと、紙のようなざらつき。動かない。
+- 色の場所と大きさ：`body::before` の各 `radial-gradient(<横>vmax <縦>vmax at <横位置>% <縦位置>%, …)`
+- 濃さ：`rgba(…, 0.95)` の最後の数字。**一番濃い所は、背景に直に乗る黒い字が 4.5:1 を割らない所が上限**（背景は画面に固定なので、見出しがどこに来ても読めるように）
+- ざらつきの強さ：`body::before` の一番上の `url("data:image/svg+xml…")` の中の `opacity='.9'`（0 にすると消える）
 
 ## 見本（preview）で確かめる
 

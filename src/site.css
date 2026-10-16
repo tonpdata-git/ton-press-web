@@ -24,8 +24,32 @@
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;color:var(--ink);font:400 16px/1.8 var(--sans);letter-spacing:.02em;background:var(--paper);
   -webkit-font-smoothing:antialiased;font-feature-settings:"palt" 0}
-/* 背景：iOSでも固定されるよう擬似要素で敷く */
-body::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--paper) url(assets/bg.jpg) center/cover no-repeat}
+/* 背景：ターコイズのグラデーション＋紙のざらつき（2026-10-17。本人が示した紫の見本のターコイズ版）
+ * 左上が深い青緑、右が鮮やかな青緑、真ん中から左下へ彩度の落ちた淡い帯が斜めに走る。動かさない。
+ * 一番深い所の上限：背景に直に乗る黒い字（ロゴ・メニュー・見出し）が 4.5:1 を割らない濃さ。
+ *   背景は画面に固定なので、見出しがどこに来ても読めるようにしてある（見本の濃紺までは暗くしない）。
+ * ざらつきは画像ファイルではなく SVG のノイズ（その場で描く・通信しない）。
+ *   同じ層の一番上に置き、background-blend-mode: overlay で色に混ぜる（明るい粒と暗い粒の両方が出る）。
+ *   背景にだけ掛かり、カードには掛からない */
+html{background:#a9d3d7}
+/* html body と強めに書くのは、theme.xml の <b:skin> にある非常用の body{background:#f4f4f2} に勝つため。
+ * 負けると body の白い面がグラデーションの層の上に塗られて、背景が真っ白になる（2026-10-17 に試験用ブログで起きた） */
+html body{background:transparent}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E") 0 0/200px 200px,
+    /* 真ん中〜左下：彩度の落ちた淡い帯（斜め） */
+    radial-gradient(46vmax 22vmax at 36% 60%,rgba(222,232,232,.95),rgba(222,232,232,0) 72%),
+    radial-gradient(40vmax 26vmax at 14% 82%,rgba(210,226,228,.90),rgba(210,226,228,0) 72%),
+    /* 右：鮮やかな青緑 */
+    radial-gradient(54vmax 60vmax at 106% 34%,rgba(26,178,188,.95) 0%,rgba(26,178,188,.55) 40%,rgba(26,178,188,.18) 68%,rgba(26,178,188,0) 90%),
+    /* 右下：中くらいの青緑 */
+    radial-gradient(40vmax 30vmax at 96% 104%,rgba(52,168,178,.75),rgba(52,168,178,0) 72%),
+    /* 左上：深い青緑（いちばん深い所。黒い字が 4.5:1 を保つ濃さで止める） */
+    radial-gradient(76vmax 46vmax at 6% -8%,rgba(64,150,160,.98) 0%,rgba(64,150,160,.6) 40%,rgba(64,150,160,.2) 68%,rgba(64,150,160,0) 90%),
+    /* 地 */
+    linear-gradient(160deg,#5aa6ae 0%,#86c3c8 35%,#c4dfe0 60%,#9fd2d6 100%);
+  background-blend-mode:overlay,normal,normal,normal,normal,normal,normal}
 a{color:inherit;text-decoration:none}a:hover{color:var(--teal2)}
 img{max-width:100%;height:auto;display:block}
 /* キーボードで操作している人に、今どこにいるかを見せる */
@@ -41,7 +65,7 @@ img{max-width:100%;height:auto;display:block}
    大きいヘッダー自体は動かさないので、記事に重なる瞬間がない */
 .hdfix{position:fixed;top:0;left:0;right:0;z-index:40;transform:translateY(-110%);visibility:hidden;transition:transform .22s ease,visibility 0s .22s}
 .hdfix.show{transform:none;visibility:visible;transition:transform .22s ease}
-.hd.mini{padding:8px 0;background:rgba(244,244,242,.85);-webkit-backdrop-filter:saturate(180%) blur(16px);backdrop-filter:saturate(180%) blur(16px);border-bottom:1px solid var(--line)}
+.hd.mini{padding:8px 0;background:rgba(255,255,255,.78);-webkit-backdrop-filter:saturate(180%) blur(16px);backdrop-filter:saturate(180%) blur(16px);border-bottom:1px solid var(--line)}
 .hd.mini .tag{display:none}
 .hd.mini .logo{width:136px}
 .hd.mini .nav{margin-top:0;grid-row:1/3;align-self:center}
@@ -52,8 +76,9 @@ img{max-width:100%;height:auto;display:block}
 .tag{font-size:17px;font-weight:700;line-height:1.5;padding-left:24px;border-left:1px solid rgba(0,0,0,.18);margin:4px 0 0;color:var(--ink)}
 .nav{grid-column:2;display:flex;gap:0 8px;flex-wrap:wrap;padding-left:12px;margin-top:8px;font-size:15px;font-weight:500}
 /* 押せる高さを 44px 確保。いま居るページは太字＋下線 */
-.nav a{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:var(--r-s);white-space:nowrap;color:var(--ink2);position:relative}
-.nav a:hover{color:var(--ink);background:rgba(0,0,0,.04)}
+/* 背景のにじみの上に直に乗るので、灰色ではなく黒に近い色にする（灰色だと 2.8:1 まで落ちた。黒なら最悪でも 7.8:1） */
+.nav a{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:var(--r-s);white-space:nowrap;color:var(--ink);position:relative}
+.nav a:hover{color:var(--ink);background:rgba(255,255,255,.45)}
 .nav a.on{color:var(--ink);font-weight:700}
 .nav a.on::after{content:"";position:absolute;left:12px;right:12px;bottom:6px;height:2px;border-radius:2px;background:var(--teal)}
 .search{grid-column:3;grid-row:1/3;align-self:end;display:flex;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 4px 4px 16px}
@@ -100,8 +125,8 @@ img{max-width:100%;height:auto;display:block}
 /* 見出しは大きさと太さだけで示す。右に「すべて見る」 */
 .sh{display:flex;align-items:baseline;gap:16px;margin-bottom:16px}
 .sh h2{font-size:24px;font-weight:700;margin:0;letter-spacing:.02em}
-.sh .all{margin-left:auto;display:inline-flex;align-items:center;gap:4px;min-height:44px;font-size:15px;font-weight:500;color:var(--teal2)}
-.sh .all:hover{color:var(--teal)}
+.sh .all{margin-left:auto;display:inline-flex;align-items:center;gap:4px;min-height:44px;font-size:15px;font-weight:500;color:var(--ink)}
+.sh .all:hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
 .sh .all .circ{border:0;background:none;width:auto;height:auto;color:inherit;font-size:16px}
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
 .card{display:grid;grid-template-columns:44% minmax(0,1fr);background:var(--panel);border-radius:var(--r);overflow:hidden;min-height:200px;box-shadow:var(--shadow);transition:box-shadow .25s,transform .25s}
@@ -132,7 +157,7 @@ img{max-width:100%;height:auto;display:block}
 .ft small{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.12);padding-top:16px;color:rgba(255,255,255,.5);font-size:12px}
 
 /* ---------- 下層ページ共通 ---------- */
-.crumb{font-size:13px;color:var(--ink3);margin:8px 0 16px}.crumb a{color:var(--teal2)}
+.crumb{font-size:13px;color:var(--ink);margin:8px 0 16px}.crumb a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}
 .sheet{background:var(--panel);border-radius:var(--r);padding:48px 56px 40px;box-shadow:var(--shadow)}
 .side{display:grid;gap:24px}
