@@ -24,28 +24,30 @@
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;color:var(--ink);font:400 16px/1.8 var(--sans);letter-spacing:.02em;background:var(--paper);
   -webkit-font-smoothing:antialiased;font-feature-settings:"palt" 0}
-/* 背景：光のにじみ（2026-10-17。写真の背景は主張が強いのでやめた）
- * 淡い青の地に、橙・黄・桃のにじみを 3 か所、濃さを変えて置く。動かさない。
- * 一番濃い所（右上）が上限。ほかはそれより淡くして、片寄らないように対角に散らす。
- * 位置と大きさは画面の大きさ（vmax）で決めるので、スマホでも同じ釣り合いになる */
-html{background:#b9cde5}
+/* 背景：ターコイズのグラデーション＋紙のざらつき（2026-10-17。本人が示した紫の見本のターコイズ版）
+ * 左上が深い青緑、右が鮮やかな青緑、真ん中から左下へ彩度の落ちた淡い帯が斜めに走る。動かさない。
+ * 一番深い所の上限：背景に直に乗る黒い字（ロゴ・メニュー・見出し）が 4.5:1 を割らない濃さ。
+ *   背景は画面に固定なので、見出しがどこに来ても読めるようにしてある（見本の濃紺までは暗くしない）。
+ * ざらつきは画像ファイルではなく SVG のノイズ（その場で描く・通信しない）。
+ *   同じ層の一番上に置き、background-blend-mode: overlay で色に混ぜる（明るい粒と暗い粒の両方が出る）。
+ *   背景にだけ掛かり、カードには掛からない */
+html{background:#a9d3d7}
 body{background:transparent}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:
-    /* 右上：いちばん濃い（これが上限） */
-    radial-gradient(19vmax 18vmax at 79% 21%,rgba(255,184,40,0.95),rgba(255,184,40,0) 72%),
-    radial-gradient(29vmax 25vmax at 83% 23%,rgba(255,118,30,0.92) 0%,rgba(250,130,80,0.70) 40%,rgba(250,130,80,0) 100%),
-    radial-gradient(46vmax 40vmax at 85% 19%,rgba(222,150,190,0.55) 0%,rgba(205,170,205,0.30) 45%,rgba(185,205,229,0) 100%),
-    /* 左下：中くらい */
-    radial-gradient(16vmax 15vmax at 11% 77%,rgba(255,184,40,0.59),rgba(255,184,40,0) 72%),
-    radial-gradient(24vmax 21vmax at 15% 79%,rgba(255,118,30,0.57) 0%,rgba(250,130,80,0.43) 40%,rgba(250,130,80,0) 100%),
-    radial-gradient(38vmax 33vmax at 17% 75%,rgba(222,150,190,0.34) 0%,rgba(205,170,205,0.19) 45%,rgba(185,205,229,0) 100%),
-    /* 中央下：いちばん淡い */
-    radial-gradient(14vmax 14vmax at 55% 107%,rgba(255,184,40,0.36),rgba(255,184,40,0) 72%),
-    radial-gradient(21vmax 19vmax at 59% 109%,rgba(255,118,30,0.35) 0%,rgba(250,130,80,0.27) 40%,rgba(250,130,80,0) 100%),
-    radial-gradient(34vmax 30vmax at 61% 105%,rgba(222,150,190,0.21) 0%,rgba(205,170,205,0.11) 45%,rgba(185,205,229,0) 100%),
-    /* 地：淡い青 */
-    linear-gradient(180deg,#b4c9e3 0%,#bfd1e6 55%,#b6cbe4 100%)}
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E") 0 0/200px 200px,
+    /* 真ん中〜左下：彩度の落ちた淡い帯（斜め） */
+    radial-gradient(46vmax 22vmax at 36% 60%,rgba(222,232,232,.95),rgba(222,232,232,0) 72%),
+    radial-gradient(40vmax 26vmax at 14% 82%,rgba(210,226,228,.90),rgba(210,226,228,0) 72%),
+    /* 右：鮮やかな青緑 */
+    radial-gradient(54vmax 60vmax at 106% 34%,rgba(26,178,188,.95) 0%,rgba(26,178,188,.55) 40%,rgba(26,178,188,.18) 68%,rgba(26,178,188,0) 90%),
+    /* 右下：中くらいの青緑 */
+    radial-gradient(40vmax 30vmax at 96% 104%,rgba(52,168,178,.75),rgba(52,168,178,0) 72%),
+    /* 左上：深い青緑（いちばん深い所。黒い字が 4.5:1 を保つ濃さで止める） */
+    radial-gradient(76vmax 46vmax at 6% -8%,rgba(64,150,160,.98) 0%,rgba(64,150,160,.6) 40%,rgba(64,150,160,.2) 68%,rgba(64,150,160,0) 90%),
+    /* 地 */
+    linear-gradient(160deg,#5aa6ae 0%,#86c3c8 35%,#c4dfe0 60%,#9fd2d6 100%);
+  background-blend-mode:overlay,normal,normal,normal,normal,normal,normal}
 a{color:inherit;text-decoration:none}a:hover{color:var(--teal2)}
 img{max-width:100%;height:auto;display:block}
 /* キーボードで操作している人に、今どこにいるかを見せる */
