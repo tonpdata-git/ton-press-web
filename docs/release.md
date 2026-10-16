@@ -30,10 +30,10 @@ GitHub の「Releases → Draft a new release」で、`main` に新しいタグ�
 
 ### 4. 本番に出す
 
-1. **本番の Blogger 管理画面 → テーマ → ▼ → バックアップ** で、今のテーマを保存しておく
-2. 「HTML を編集」で、3. と同じ 2 か所の版番号を書き換えて保存
-3. https://ton-press.blogspot.com/ を開いて確かめる
-4. どの版を本番に出したかを、Pull Request か Release にコメントで残す
+1. 本番の「HTML を編集」で、3. と同じ 2 か所の版番号を書き換えて保存
+   （バックアップは要らない。戻すのは番号を書き戻すだけで、どの版の中身も GitHub に残っている）
+2. https://ton-press.blogspot.com/ を開いて確かめる
+3. どの版を本番に出したかを、Pull Request か Release にコメントで残す
 
 ## 戻し方
 
@@ -43,7 +43,7 @@ GitHub の「Releases → Draft a new release」で、`main` に新しいタグ�
 2. 直ったことを確かめる
 3. 原因は落ち着いてから Pull Request で直す
 
-殻（`theme.xml`）ごと壊れたときは、「テーマ → ▼ → 復元」で、4-1 で保存したバックアップを入れ直す。
+殻（`theme.xml`）ごと壊れたときは、「テーマ → ▼ → 復元」で、全文を貼り替える前に取ったバックアップを入れ直す。
 
 ## 殻（theme.xml）そのものを変えるとき
 
