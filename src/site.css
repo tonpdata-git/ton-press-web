@@ -24,8 +24,30 @@
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;color:var(--ink);font:400 16px/1.8 var(--sans);letter-spacing:.02em;background:var(--paper);
   -webkit-font-smoothing:antialiased;font-feature-settings:"palt" 0}
-/* 背景：iOSでも固定されるよう擬似要素で敷く */
-body::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--paper) url(assets/bg.jpg) center/cover no-repeat}
+/* 背景：淡いグラデーションがゆっくり動く（2026-10-17。写真の背景は主張が強いのでやめた）
+ * 色は以前の背景画像と同じ系統（ターコイズ・淡い灰・温かいベージュ）。
+ * 色の位置を毎回描き直すと画面全体の再描画が続いて重いので、大きく描いた層ごと transform で動かす。
+ * 2 枚の層を違う周期で動かし、同じ模様の繰り返しに見えないようにしている */
+html{background:var(--paper)}
+body{background:transparent}
+body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:none;inset:-30%;will-change:transform}
+body::before{
+  background:
+    radial-gradient(38% 34% at 18% 22%,rgba(29,107,120,.20),transparent 70%),
+    radial-gradient(34% 30% at 84% 16%,rgba(19,80,92,.16),transparent 72%),
+    radial-gradient(40% 36% at 78% 82%,rgba(29,107,120,.14),transparent 72%),
+    radial-gradient(36% 32% at 14% 86%,rgba(214,196,170,.30),transparent 70%),
+    linear-gradient(135deg,#f6f6f3 0%,#eef2f2 50%,#f4f1ec 100%);
+  animation:bgDriftA 38s ease-in-out infinite alternate}
+body::after{
+  background:
+    radial-gradient(30% 28% at 60% 40%,rgba(255,255,255,.55),transparent 70%),
+    radial-gradient(26% 24% at 36% 62%,rgba(19,80,92,.08),transparent 72%),
+    radial-gradient(28% 26% at 92% 52%,rgba(214,196,170,.18),transparent 72%);
+  animation:bgDriftB 30s ease-in-out infinite alternate}
+@keyframes bgDriftA{0%{transform:translate3d(-4%,-3%,0) rotate(0deg)}50%{transform:translate3d(3%,2%,0) rotate(4deg)}100%{transform:translate3d(-2%,4%,0) rotate(-3deg)}}
+@keyframes bgDriftB{0%{transform:translate3d(5%,3%,0) scale(1)}100%{transform:translate3d(-5%,-4%,0) scale(1.08)}}
+@media (prefers-reduced-motion:reduce){body::before,body::after{animation:none}}
 a{color:inherit;text-decoration:none}a:hover{color:var(--teal2)}
 img{max-width:100%;height:auto;display:block}
 /* キーボードで操作している人に、今どこにいるかを見せる */
