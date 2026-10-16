@@ -180,8 +180,9 @@
       esc(lab(p, l)) + ' ・ ' + ymd(p.date) + '</span><h3>' + esc(p.title) + '</h3><p>' + esc(p.summary) + '</p><span class="go circ">›</span></div></a>';
   }
   function secHead(l, e, all) {
-    return '<div class="sh"><h2>' + esc(l) + '</h2><span class="bar"></span><span class="en">' + esc(e) + '</span>' +
-      (all ? '<a class="all" href="' + esc(all) + '">すべて見る <span class="circ">→</span></a>' : '') + '</div>';
+    // 見出しは文字だけ（英字の小見出し・飾り線は付けない）。第 2 引数 e は互換のため残している
+    return '<div class="sh"><h2>' + esc(l) + '</h2>' +
+      (all ? '<a class="all" href="' + esc(all) + '">すべて見る <span class="circ" aria-hidden="true">›</span></a>' : '') + '</div>';
   }
 
   function renderHome(latest, bySection) {
@@ -204,7 +205,7 @@
       }).join('') +
       (slides.length > 1 ? '<div class="pager"><button type="button" aria-label="前へ" data-d="-1">‹</button><span id="pn">01 / ' +
         pad(slides.length) + '</span><button type="button" aria-label="次へ" data-d="1">›</button></div>' : '') + '</div>' +
-      '<div class="panel"><div class="ph2"><h2>新着記事</h2><span class="bar"></span><span class="en">NEW ARRIVALS</span></div>' +
+      '<div class="panel"><div class="ph2"><h2>新着記事</h2></div>' +
       rest.map(newsRow).join('') + '</div>';
 
     blocks.innerHTML = CONFIG.sections.map(function (s, i) {
@@ -310,17 +311,96 @@
     });
   }
 
+  /* ---------- PDF版のページ：手書きのリンクを号ごとのカードに組み直す ----------
+   * ページ本文（Blogger の「ページ」で部員が更新する所）は今まで通り
+   *   「4月号（508号） 全面/1面/2面 …」のように書けばよい。読み取ってカードにする。
+   * 読み取れる号が 2 つ未満なら、何もしない（元の本文をそのまま見せる） */
+  function onPdfPage() {
+    return PAGE === 'page' && (location.pathname === CONFIG.careerPage ||
+      (location.hostname !== 'ton-press.blogspot.com' && /^PDF版/.test(document.title)));
+  }
+  function buildPdfIssues() {
+    if (!onPdfPage()) return;
+    var body = $('.post-body');
+    if (!body) return;
+    var issues = [], extras = [], note = '', year = '', cur = null;
+    var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+    for (var n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (n.nodeType === 1) {
+        if (n.tagName !== 'A') continue;
+        var t = n.textContent.replace(/\s+/g, '');
+        if (/^(全面|\d+面)$/.test(t) && cur) cur.parts.push({ label: t, url: n.href });
+        else if (t) extras.push({ label: t, url: n.href });
+        continue;
+      }
+      if (n.parentNode && n.parentNode.closest && n.parentNode.closest('a')) continue;   // リンクの中の字は上で拾った
+      var s = n.nodeValue.replace(/[\s\u00a0]+/g, ' ').trim();
+      if (!s) continue;
+      if (/無断転載|DL|ダウンロード/.test(s) && !note) { note = s; continue; }
+      var y = s.match(/(\d{4})年度/); if (y) year = y[1];
+      var m = s.match(/(\S*?号(?:（[^）]*）)?)/);
+      if (m && !/^年度$/.test(m[1])) {
+        var name = m[1].replace(/[/／]$/, '');
+        var no = (name.match(/（(\d+)号）/) || [])[1];
+        cur = { name: name.replace(/（\d+号）/, ''), no: no, year: year, parts: [] };
+        issues.push(cur);
+      }
+    }
+    issues = issues.filter(function (i) { return i.parts.length; });
+    if (issues.length < 2) return;
+    issues.reverse();   // 新しい号を先に
+
+    var byYear = {}, years = [];
+    issues.forEach(function (i) {
+      var k = i.year || '';
+      if (!byYear[k]) { byYear[k] = []; years.push(k); }
+      byYear[k].push(i);
+    });
+    var html = '<div class="pdfbox">' + (note ? '<p class="pdf-note">' + esc(note) + '</p>' : '');
+    years.forEach(function (k, yi) {
+      if (k) html += '<h2 class="pdf-year">' + esc(k) + '年度</h2>';
+      html += '<div class="issues">' + byYear[k].map(function (i, ii) {
+        var full = i.parts.filter(function (p) { return p.label === '全面'; })[0];
+        var pages = i.parts.filter(function (p) { return p.label !== '全面'; });
+        return '<div class="issue' + (yi === 0 && ii === 0 ? ' latest' : '') + '">' +
+          (yi === 0 && ii === 0 ? '<span class="badge">最新号</span>' : '') +
+          '<h3>' + esc(i.name) + (i.no ? '<span class="no">第' + esc(i.no) + '号</span>' : '') + '</h3>' +
+          (full ? '<a class="full" href="' + esc(full.url) + '" target="_blank" rel="noopener">全面を読む</a>' : '') +
+          (pages.length ? '<div class="parts">' + pages.map(function (p) {
+            return '<a href="' + esc(p.url) + '" target="_blank" rel="noopener" aria-label="' + esc(i.name + ' ' + p.label) + '">' + esc(p.label) + '</a>';
+          }).join('') + '</div>' : '') + '</div>';
+      }).join('') + '</div>';
+    });
+    if (extras.length) html += '<div class="pdf-more">' + extras.map(function (x) {
+      return '<a href="' + esc(x.url) + '">' + esc(x.label) + ' ›</a>';
+    }).join('') + '</div>';
+    html += '</div>';
+    body.insertAdjacentHTML('beforebegin', html);
+    body.hidden = true;   // 元の本文は消さずに隠すだけ（読み取りに失敗したら hidden を外せば元通り）
+  }
+
+  /* ---------- 右の欄のラベル：多いときは 12 個で畳む ---------- */
+  function foldTags() {
+    document.querySelectorAll('.side .tags').forEach(function (box) {
+      var n = box.querySelectorAll('a').length;
+      if (n <= 14) return;
+      box.classList.add('folded');
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'more';
+      b.textContent = 'すべて表示（' + n + '）';
+      b.addEventListener('click', function () { box.classList.remove('folded'); b.remove(); });
+      box.appendChild(b);
+    });
+  }
+
   /* ---------- PDF版のページ：進路データの欄を足す ---------- */
   function renderCareerData() {
     if (PAGE !== 'page' || !CONFIG.careerData.length) return;
     var body = $('.post-body');
-    var onPdfPage = location.pathname === CONFIG.careerPage ||
-      // 試験用ブログでは住所が違うので、題名でも判定する
-      (location.hostname !== 'ton-press.blogspot.com' && /^PDF版/.test(document.title));
-    if (!body || !onPdfPage) return;
+    if (!body || !onPdfPage()) return;   // 試験用ブログでは住所が違うので、題名でも判定する
     var box = document.createElement('section');
     box.className = 'career';
-    box.innerHTML = '<div class="sh"><h2>進路データ</h2><span class="bar"></span><span class="en">CAREER DATA</span></div>' +
+    box.innerHTML = '<div class="sh"><h2>進路データ</h2></div>' +
       '<p>東北大生の卒業後の進路をまとめた記事です。</p><div class="tags">' +
       CONFIG.careerData.map(function (c) { return '<a href="' + esc(c[1]) + '">' + esc(c[0]) + '</a>'; }).join('') + '</div>';
     body.parentNode.insertBefore(box, body.nextSibling);
@@ -363,6 +443,8 @@
     loadHome().then(function () { if (curtain) curtain.ready(); });
   }
   renderShare();
+  buildPdfIssues();
   renderCareerData();
+  foldTags();
   relinkPagesOffProduction();
 })();
