@@ -8,12 +8,32 @@
   見た目（site.css）と動き（app.js）は jsDelivr から読む。普段の変更はそちらで行い、
   このファイルは版番号（下の ASSET_VERSION の 2 か所）を書き換えるときしか触らない。
 
-  状態：草案。試験用ブログで動作を確かめるまで本番に入れないこと（docs/release.md）。
+  状態：2026-10-09 から本番で使用中。全文を貼り替えるときは docs/release.md の手順で。
 -->
-<html b:css='false' b:defaultwidgetversion='2' b:layoutsVersion='3' b:responsive='true' b:templateVersion='0.1.1' expr:dir='data:blog.languageDirection' lang='ja' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+<html b:css='false' b:defaultwidgetversion='2' b:layoutsVersion='3' b:responsive='true' b:templateVersion='0.2.0' expr:dir='data:blog.languageDirection' lang='ja' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
 <head>
   <meta content='width=device-width, initial-scale=1' name='viewport'/>
   <b:include data='blog' name='all-head-content'/>
+
+  <!-- X（旧 Twitter）などで共有されたときのカード。
+       all-head-content は題名・URL・説明文と、記事に写真があるときの og:image までしか出さない。
+       twitter:card が無いと X はカードを出さないので、ここで足す（旧テーマには入っていたが、
+       2026-10-09 の切り替えで抜けていた。2026-10-18 に戻した）。 -->
+  <meta content='summary_large_image' name='twitter:card'/>
+  <meta content='@ton_press' name='twitter:site'/>
+  <meta expr:content='data:blog.title' property='og:site_name'/>
+  <b:if cond='data:view.isSingleItem'>
+    <meta content='article' property='og:type'/>
+  <b:else/>
+    <meta content='website' property='og:type'/>
+  </b:if>
+  <!-- 写真の無い記事・トップ・一覧では、代わりの画像（ロゴ）を出す。
+       住所は CSS/JS の版番号とは別の、この画像専用の固定の版（og-1）。画像を差し替えるときだけ og-2 にする -->
+  <b:if cond='!data:view.featuredImage'>
+    <meta content='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@og-1/src/assets/og-default.png' property='og:image'/>
+    <meta content='1200' property='og:image:width'/>
+    <meta content='630' property='og:image:height'/>
+  </b:if>
   <title><b:if cond='data:view.isHomepage'><data:blog.title.escaped/><b:else/><data:view.title.escaped/> | <data:blog.title.escaped/></b:if></title>
   <link href='https://fonts.googleapis.com' rel='preconnect'/>
   <link href='https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@700&amp;display=swap' rel='stylesheet'/>
