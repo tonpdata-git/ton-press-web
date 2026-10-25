@@ -34,6 +34,7 @@
     // ヘッダーのメニュー（[表示名, リンク先]）
     nav: [
       ['トップ', '/'],
+      ['新着', '/search'],   // 全記事を新しい順に（2026-10-26、部員の要望）
       ['インタビュー', '/search/label/インタビュー'],
       ['研究', '/search/label/研究'],
       ['イベント', '/search/label/イベント'],
@@ -206,7 +207,8 @@
       (slides.length > 1 ? '<div class="pager"><button type="button" aria-label="前へ" data-d="-1">‹</button><span id="pn">01 / ' +
         pad(slides.length) + '</span><button type="button" aria-label="次へ" data-d="1">›</button></div>' : '') + '</div>' +
       '<div class="panel"><div class="ph2"><h2>新着記事</h2></div>' +
-      rest.map(newsRow).join('') + '</div>';
+      rest.map(newsRow).join('') +
+      '<a class="more-link" href="/search">すべての新着記事 <span aria-hidden="true">›</span></a></div>';
 
     blocks.innerHTML = CONFIG.sections.map(function (s, i) {
       var items = (bySection[i] || []).slice(0, CONFIG.perSection);
@@ -250,6 +252,61 @@
         if (S) renderHome(S.latest, CONFIG.sections.map(function (s) { return S[s[0]] || []; }));
         else renderHome([], []);
       });
+  }
+
+  /* ---------- 全記事の一覧（/search）：見出しを「新着記事」にする ----------
+   * テーマは検索語が無いときの見出しを想定しておらず「「」の検索結果」と出ていた */
+  function fixLatestHeading() {
+    if (PAGE !== 'list' || location.pathname !== '/search') return;
+    var q = new URLSearchParams(location.search).get('q');
+    if (q) return;
+    var h = $('.lh .sh h2');
+    if (h) h.textContent = '新着記事';
+    var crumb = $('.crumb');
+    if (crumb) crumb.innerHTML = crumb.innerHTML.replace('検索結果', '新着記事');
+    var lh = $('.lh');
+    if (lh && !lh.querySelector('p')) {
+      var p = document.createElement('p');
+      p.textContent = 'すべての記事を新しい順に並べています。';
+      lh.appendChild(p);
+    }
+  }
+
+  /* ---------- 記事カードに「リンクをコピー」「Xで投稿」を付ける ----------
+   * 一覧から記事を開かずにリンクを取れるようにする（2026-10-26、部員の要望「リンクをコピーできなくて X に載せられない」）。
+   * カードは丸ごと <a> なので、ボタンは中に入れず、外側の箱に並べる */
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (ok, ng) {
+      var t = document.createElement('textarea');
+      t.value = text; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0';
+      document.body.appendChild(t); t.select();
+      try { document.execCommand('copy') ? ok() : ng(); } catch (e) { ng(e); }
+      t.remove();
+    });
+  }
+  function decorateCards(root) {
+    (root || document).querySelectorAll('a.card:not([data-act])').forEach(function (a) {
+      a.setAttribute('data-act', '');
+      var url = a.href, h = a.querySelector('h3'), title = h ? h.textContent.trim() : '';
+      var box = document.createElement('div');
+      box.className = 'card-wrap';
+      a.parentNode.insertBefore(box, a);
+      box.appendChild(a);
+      var act = document.createElement('div');
+      act.className = 'card-act';
+      act.innerHTML = '<button type="button" class="act-copy">リンクをコピー</button>' +
+        '<a class="act-x" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=' +
+        encodeURIComponent(url) + '&amp;text=' + encodeURIComponent(title) + '">Xで投稿</a>';
+      box.appendChild(act);
+      var b = act.querySelector('.act-copy');
+      b.addEventListener('click', function () {
+        copyText(url).then(function () {
+          b.textContent = 'コピーしました'; b.classList.add('done');
+          setTimeout(function () { b.textContent = 'リンクをコピー'; b.classList.remove('done'); }, 1800);
+        }, function () { window.prompt('このリンクをコピーしてください', url); });
+      });
+    });
   }
 
   /* ---------- 開幕演出（トップ・1 回の訪問で 1 度だけ） ----------
@@ -440,9 +497,11 @@
   renderChrome();
   if (PAGE === 'index') {
     var curtain = intro();
-    loadHome().then(function () { if (curtain) curtain.ready(); });
+    loadHome().then(function () { decorateCards(); if (curtain) curtain.ready(); });
   }
   renderShare();
+  fixLatestHeading();
+  if (PAGE !== 'index') decorateCards();
   buildPdfIssues();
   renderCareerData();
   foldTags();
