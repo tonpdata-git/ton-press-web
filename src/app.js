@@ -90,6 +90,11 @@
       ? '<img loading="lazy" src="' + esc(p.img) + '" alt="">'
       : '<div class="noimg"><img src="' + ASSETS + 'logo.png" alt=""></div>';
   }
+  // Blogger の画像の住所に入っている大きさ（/s72-c/ /s72-w400-h266-c/ /w240/ =w240 など）を、幅 w に書き換える
+  function sized(url, w) {
+    return String(url).replace(/\/[swh]\d+(-[a-z0-9]+)*\//, '/w' + w + '/')
+      .replace(/=[swh]\d+(-[a-z0-9]+)*$/, '=w' + w);
+  }
   function here(href) {
     try { return decodeURI(location.pathname) === decodeURI(href); } catch (e) { return false; }
   }
@@ -155,8 +160,8 @@
       title: e.title.$t,
       url: link ? link.href : '#',
       date: e.published.$t,
-      // サムネイルは 72px の正方形で来るので、大きい版の住所に書き換える
-      img: thumb ? thumb.replace(/\/s\d+(-c)?\//, '/w900/').replace(/=s\d+(-c)?$/, '=w900') : null,
+      // サムネイルは 72px で来るので、大きい版の住所に書き換える（高解像度の画面でも粗くならない幅）
+      img: thumb ? sized(thumb, 1200) : null,
       summary: text.slice(0, 110),
       labels: (e.category || []).map(function (c) { return c.term; })
     };
@@ -307,6 +312,47 @@
         }, function () { window.prompt('このリンクをコピーしてください', url); });
       });
     });
+  }
+
+  /* ---------- 画像 ---------- */
+  // theme.xml が組む一覧・人気記事の写真は小さい版（640px・240px）なので、表示の大きさに見合う版に替える
+  function sharpenThumbs() {
+    document.querySelectorAll('.card .ph img, .news .ph img').forEach(function (im) {
+      var w = im.closest('.news') ? 480 : 1200, src = sized(im.getAttribute('src'), w);
+      if (src !== im.getAttribute('src')) im.src = src;
+    });
+  }
+  // 記事内の写真を押したときの拡大。Blogger 標準の拡大は写真の大きさで出方が変わるので、
+  // それより先にクリックを受け取り、どの写真も同じ枠（画面の 92%×88%）に収めて出す
+  function zoomImages() {
+    if (PAGE !== 'article' && PAGE !== 'page') return;
+    window.addEventListener('click', function (ev) {
+      var im = ev.target.closest && ev.target.closest('.post-body img');
+      if (!im || ev.button) return;
+      ev.preventDefault(); ev.stopImmediatePropagation();
+      var a = im.closest('a'), href = a && a.getAttribute('href');
+      var src = href && /googleusercontent|bp\.blogspot/.test(href) ? href : im.currentSrc || im.src;
+      var box = document.createElement('div');
+      box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', '写真の拡大');
+      // 大きい版が届くまでは、いま表示している小さい版をぼかして出し、回る輪で読み込み中と分かるようにする
+      box.className = 'zoom loading';
+      box.innerHTML = '<img alt="" src="' + esc(im.currentSrc || im.src) + '"><span class="zoom-spin" aria-label="読み込み中"></span>' +
+        '<button type="button" aria-label="閉じる">×</button>';
+      var big = new Image(), shown = box.querySelector('img');
+      big.onload = function () { shown.src = big.src; box.classList.remove('loading'); };
+      big.onerror = function () { box.classList.remove('loading'); };
+      big.src = sized(src, 2000);
+      document.body.appendChild(box);
+      requestAnimationFrame(function () { box.classList.add('on'); });
+      function close() {
+        box.classList.remove('on'); document.removeEventListener('keydown', key);
+        setTimeout(function () { box.remove(); }, 200);
+      }
+      function key(e) { if (e.key === 'Escape') close(); }
+      box.addEventListener('click', close);
+      document.addEventListener('keydown', key);
+      box.querySelector('button').focus();
+    }, true);
   }
 
   /* ---------- 開幕演出（トップ・1 回の訪問で 1 度だけ） ----------
@@ -506,4 +552,6 @@
   renderCareerData();
   foldTags();
   relinkPagesOffProduction();
+  sharpenThumbs();
+  zoomImages();
 })();
