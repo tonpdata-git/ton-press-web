@@ -302,3 +302,12 @@ html.intro-lock{overflow:hidden}
   .card-act{left:128px;bottom:10px}
   .card-act button,.card-act a{min-height:32px;padding:0 10px;font-size:12px}
 }
+
+/* ---------- 記事内の写真の拡大（app.js の zoomImages()） ---------- */
+.zoom{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(10,20,24,.88);opacity:0;transition:opacity .2s ease;cursor:zoom-out}
+.zoom.on{opacity:1}
+.zoom img{width:92vw;height:88vh;object-fit:contain;transform:scale(.96);transition:transform .2s ease}
+.zoom.on img{transform:none}
+.zoom button{position:absolute;top:16px;right:16px;width:44px;height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:24px;line-height:44px;cursor:pointer}
+.post-body img{cursor:zoom-in}
+@media (prefers-reduced-motion:reduce){.zoom,.zoom img{transition:none}}
