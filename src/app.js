@@ -333,9 +333,15 @@
       var a = im.closest('a'), href = a && a.getAttribute('href');
       var src = href && /googleusercontent|bp\.blogspot/.test(href) ? href : im.currentSrc || im.src;
       var box = document.createElement('div');
-      box.className = 'zoom';
       box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', '写真の拡大');
-      box.innerHTML = '<img alt="" src="' + esc(sized(src, 2000)) + '"><button type="button" aria-label="閉じる">×</button>';
+      // 大きい版が届くまでは、いま表示している小さい版をぼかして出し、回る輪で読み込み中と分かるようにする
+      box.className = 'zoom loading';
+      box.innerHTML = '<img alt="" src="' + esc(im.currentSrc || im.src) + '"><span class="zoom-spin" aria-label="読み込み中"></span>' +
+        '<button type="button" aria-label="閉じる">×</button>';
+      var big = new Image(), shown = box.querySelector('img');
+      big.onload = function () { shown.src = big.src; box.classList.remove('loading'); };
+      big.onerror = function () { box.classList.remove('loading'); };
+      big.src = sized(src, 2000);
       document.body.appendChild(box);
       requestAnimationFrame(function () { box.classList.add('on'); });
       function close() {
