@@ -10,7 +10,7 @@
 
   状態：2026-10-09 から本番で使用中。全文を貼り替えるときは docs/release.md の手順で。
 -->
-<html b:css='false' b:defaultwidgetversion='2' b:layoutsVersion='3' b:responsive='true' b:templateVersion='0.2.0' expr:dir='data:blog.languageDirection' lang='ja' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+<html b:css='false' b:defaultwidgetversion='2' b:layoutsVersion='3' b:responsive='true' b:templateVersion='0.3.0' expr:dir='data:blog.languageDirection' lang='ja' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
 <head>
   <meta content='width=device-width, initial-scale=1' name='viewport'/>
   <b:include data='blog' name='all-head-content'/>
@@ -38,7 +38,7 @@
   <link href='https://fonts.googleapis.com' rel='preconnect'/>
   <link href='https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@700&amp;display=swap' rel='stylesheet'/>
   <!-- ASSET_VERSION (1/2)：本番に出す版。上げるときはここと末尾の script の 2 か所を同じ番号にする -->
-  <link href='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.3.0/src/site.css' rel='stylesheet'/>
+  <link href='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.5.0/src/site.css' rel='stylesheet'/>
   <b:skin><![CDATA[
 /* CDN に届かなかったときの最低限（文字が読めればよい） */
 body{margin:0;font-family:"Yu Gothic UI","Hiragino Sans",Meiryo,sans-serif;line-height:1.8;color:#1b1f24;background:#f4f4f2}
@@ -179,9 +179,36 @@ img{max-width:100%;height:auto}
   </div>
 </main>
 
+<!-- お問い合わせフォーム（Blogger の部品）。旧テーマではページ下部にあり、どのページからでも送れた。
+     2026-10-09 の切り替えで抜けていたのを 2026-11-11 に戻した。送信の処理は Blogger が id を見て行うので、
+     id（ContactForm1_contact-form-…）は変えない -->
+<b:section class='contact-sec' id='contact-section' maxwidgets='1' name='お問い合わせ' showaddelement='true'>
+  <b:widget id='ContactForm1' locked='false' title='お問い合わせ' type='ContactForm' version='2' visible='true'>
+    <b:includable id='main'>
+      <div class='wrap'><div class='contact' id='contact'>
+        <div class='contact-head'>
+          <h2>お問い合わせ</h2>
+          <p>無料定期購読、ポストの設置、広告掲載、取材のご依頼、ご意見ご感想などはこちらから。詳しくは<a href='/p/blog-page_15.html'>お問い合わせ方法</a>をご覧ください。</p>
+        </div>
+        <form class='contact-form' name='contact-form'>
+          <label>お名前<input class='contact-form-name' expr:id='data:widget.instanceId + &quot;_contact-form-name&quot;' name='name' type='text' value=''/></label>
+          <label>メールアドレス（必須）<input class='contact-form-email' expr:id='data:widget.instanceId + &quot;_contact-form-email&quot;' name='email' type='email' value=''/></label>
+          <label class='wide'>お問い合わせ内容（必須）<textarea class='contact-form-email-message' expr:id='data:widget.instanceId + &quot;_contact-form-email-message&quot;' name='email-message' rows='5'/></label>
+          <div class='contact-send'>
+            <input class='contact-form-button contact-form-button-submit' expr:id='data:widget.instanceId + &quot;_contact-form-submit&quot;' type='button' value='送信する'/>
+            <p class='contact-form-error-message' expr:id='data:widget.instanceId + &quot;_contact-form-error-message&quot;'/>
+            <p class='contact-form-success-message' expr:id='data:widget.instanceId + &quot;_contact-form-success-message&quot;'/>
+          </div>
+        </form>
+      </div>
+      </div>
+    </b:includable>
+  </b:widget>
+</b:section>
+
 <footer class='ft' id='ft'/>
 
 <!-- ASSET_VERSION (2/2) -->
-<script defer='defer' src='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.3.0/src/app.js'/>
+<script defer='defer' src='https://cdn.jsdelivr.net/gh/tonpdata-git/ton-press-web@v0.5.0/src/app.js'/>
 </body>
 </html>

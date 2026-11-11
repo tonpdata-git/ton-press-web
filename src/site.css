@@ -182,6 +182,10 @@ img{max-width:100%;height:auto;display:block}
 .pdfbox{margin-top:8px}
 .pdf-note{display:inline-flex;align-items:center;gap:8px;margin:0 0 24px;padding:8px 16px;border-radius:999px;background:var(--tint);color:var(--teal);font-size:13px;font-weight:700}
 .pdf-year{font-size:13px;font-weight:700;color:var(--ink3);margin:32px 0 16px;letter-spacing:.04em}
+.pdf-years{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 32px}
+.pdf-years a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--teal);font-size:14px;font-weight:700}
+.pdf-years a:hover{background:var(--tint)}
+.pdf-year{scroll-margin-top:96px}
 .pdf-year:first-of-type{margin-top:0}
 .issues{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
 .issue{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px;transition:box-shadow .25s,transform .25s}
@@ -316,3 +320,23 @@ html.intro-lock{overflow:hidden}
 .zoom.loading .zoom-spin{opacity:1;animation:zoomspin .8s linear infinite}
 @keyframes zoomspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.zoom,.zoom img{transition:none}.zoom.loading .zoom-spin{animation-duration:2.4s}}
+
+/* ---------- お問い合わせフォーム（theme.xml の ContactForm1。どのページでもフッターの上に出る） ---------- */
+.contact-sec{margin:64px 0 0}
+.contact{display:grid;grid-template-columns:1fr 2fr;gap:32px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:32px}
+.contact-head h2{font-size:22px;font-weight:700;margin:0 0 8px}
+.contact-head p{font-size:14px;color:var(--ink2);margin:0}
+.contact-head a{color:var(--teal2);text-decoration:underline}
+.contact-form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.contact-form label{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:700;color:var(--ink2)}
+.contact-form label.wide,.contact-send{grid-column:1/-1}
+.contact-form input[type=text],.contact-form input[type=email],.contact-form textarea{font:inherit;font-size:16px;font-weight:400;color:var(--ink);min-height:44px;padding:8px 12px;border:1px solid #8e9499;border-radius:8px;background:#fff;box-sizing:border-box;width:100%}
+.contact-form textarea{min-height:128px;resize:vertical}
+.contact-form input:focus,.contact-form textarea:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:transparent}
+.contact-send{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+.contact-form-button{min-height:44px;padding:0 32px;border:0;border-radius:999px;background:var(--teal);color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.contact-form-button:hover{background:var(--teal2)}
+.contact-form-error-message,.contact-form-success-message{margin:0;font-size:14px}
+.contact-form-error-message{color:#b3261e}
+.contact-form-success-message{color:var(--teal)}
+@media (max-width:760px){.contact{grid-template-columns:1fr;padding:24px}.contact-form{grid-template-columns:1fr}}
